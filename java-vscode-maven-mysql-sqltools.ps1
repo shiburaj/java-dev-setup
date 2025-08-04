@@ -13,11 +13,10 @@ choco upgrade chocolatey -y
 #----------------------------
 # 1. Install Tools
 #----------------------------
-choco install microsoft-openjdk21 -y
+choco install microsoft-openjdk-21 -y
 choco install maven -y
 choco install vscode -y
-choco install mysql --params "'/RootPassword:root /Port:3306'" -y
-choco install heidisql -y
+choco install mysql -y
 
 #----------------------------
 # 2. Set Environment Variables
@@ -54,9 +53,12 @@ code --install-extension pivotal.vscode-spring-boot
 code --install-extension vmware.vscode-spring-boot-dashboard
 code --install-extension vscjava.vscode-spring-initializr
 code --install-extension vscjava.vscode-spring-boot-tools
-
+code --install-extension mtxr.sqltools
+code --install-extension mtxr.sqltools-driver-mysql
+code --install-extension mtxr.sqltools-driver-sqlite
 #----------------------------
 # 4. Completion Message
 #----------------------------
 Write-Host "`n✅ Development environment setup completed successfully!"
+Write-Host "`n✅ Java 21, Maven, MySQL, and SQLTools have been installed. Java extensions also installed."
 Write-Host "👉 Please restart your terminal or system to apply environment variables."
