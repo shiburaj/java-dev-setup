@@ -4,7 +4,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString("https://community.chocolatey.org/install.ps1"))
 
 # Ensure Chocolatey is available in this session
-$chocoExe = "$env:ProgramData\chocolatey\bin\choco.exe"
+& $chocoExe = "$env:ProgramData\chocolatey\bin\choco.exe"
 if (-not (Test-Path $chocoExe)) {
     Write-Error "Chocolatey executable not found. Installation might have failed."
     exit 1
@@ -14,12 +14,12 @@ $env:PATH += ";$($env:ProgramData)\chocolatey\bin"
 # Menu-Driven Installer Script with IDEs, Tomcat v10, SQLTools Extensions, and Suggested Tools Menu
 
 function Install-ChocoIfNeeded {
-    if (!(Get-Command $chocoExe -ErrorAction SilentlyContinue)) {
+    if (!(Get-Command & $chocoExe -ErrorAction SilentlyContinue)) {
         Set-ExecutionPolicy Bypass -Scope Process -Force
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
         iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
     }
-    $chocoExe upgrade chocolatey -y
+    & $chocoExe upgrade chocolatey -y
 }
 
 function Set-EnvVars {
@@ -58,7 +58,7 @@ function Setup-Tomcat-Connector {
     }
 
     # Install Apache Tomcat v10
-    $chocoExe install tomcat -y
+    & $chocoExe install tomcat -y
 
     # VS Code Community Server Connector config
     $serverConfig = @{
@@ -103,68 +103,68 @@ do {
     foreach ($c in $choices) {
         switch ($c.Trim()) {
             "1"  { Install-ChocoIfNeeded }
-            "2"  { $chocoExe install microsoft-openjdk-21 -y }
-            "3"  { $chocoExe install maven -y }
-            "4"  { $chocoExe install vscode -y }
+            "2"  { & $chocoExe install microsoft-openjdk-21 -y }
+            "3"  { & $chocoExe install maven -y }
+            "4"  { & $chocoExe install vscode -y }
 
 # Detect VS Code executable path
-$codeCmd = "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd"
+& $codeCmd = "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd"
 if (-not (Test-Path $codeCmd)) {
-    $codeCmd = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd"
+    & $codeCmd = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd"
 }
 if (-not (Test-Path $codeCmd)) {
     Write-Error "VS Code executable not found. Please check installation."
     exit 1
 }
-            "5"  { $chocoExe install mysql -y }
-            "6"  { $chocoExe install heidisql -y }
-            "7"  { $chocoExe install dbeaver -y }
-            "8"  { $chocoExe install eclipse --params "'/Product:jee'" -y }
-            "9"  { $chocoExe install intellijidea-community -y }
+            "5"  { & $chocoExe install mysql -y }
+            "6"  { & $chocoExe install heidisql -y }
+            "7"  { & $chocoExe install dbeaver -y }
+            "8"  { & $chocoExe install eclipse --params "'/Product:jee'" -y }
+            "9"  { & $chocoExe install intellijidea-community -y }
             "10" { Setup-Tomcat-Connector }
             "11" { Set-EnvVars }
             "12" { Install-Extensions }
             "13" {
                 Install-ChocoIfNeeded
-                $chocoExe install microsoft-openjdk-21 -y
-                $chocoExe install maven -y
-                $chocoExe install vscode -y
+                & $chocoExe install microsoft-openjdk-21 -y
+                & $chocoExe install maven -y
+                & $chocoExe install vscode -y
 
 # Detect VS Code executable path
-$codeCmd = "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd"
+& $codeCmd = "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd"
 if (-not (Test-Path $codeCmd)) {
-    $codeCmd = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd"
+    & $codeCmd = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd"
 }
 if (-not (Test-Path $codeCmd)) {
     Write-Error "VS Code executable not found. Please check installation."
     exit 1
 }
-                $chocoExe install mysql -y
-                $chocoExe install heidisql -y
+                & $chocoExe install mysql -y
+                & $chocoExe install heidisql -y
                 Setup-Tomcat-Connector
                 Set-EnvVars
                 Install-Extensions
             }
             "14" {
                 Install-ChocoIfNeeded
-                $chocoExe install microsoft-openjdk-21 -y
-                $chocoExe install maven -y
-                $chocoExe install vscode -y
+                & $chocoExe install microsoft-openjdk-21 -y
+                & $chocoExe install maven -y
+                & $chocoExe install vscode -y
 
 # Detect VS Code executable path
-$codeCmd = "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd"
+& $codeCmd = "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd"
 if (-not (Test-Path $codeCmd)) {
-    $codeCmd = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd"
+    & $codeCmd = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd"
 }
 if (-not (Test-Path $codeCmd)) {
     Write-Error "VS Code executable not found. Please check installation."
     exit 1
 }
-                $chocoExe install mysql -y
-                $chocoExe install heidisql -y
-                $chocoExe install dbeaver -y
-                $chocoExe install eclipse --params "'/Product:jee'" -y
-                $chocoExe install intellijidea-community -y
+                & $chocoExe install mysql -y
+                & $chocoExe install heidisql -y
+                & $chocoExe install dbeaver -y
+                & $chocoExe install eclipse --params "'/Product:jee'" -y
+                & $chocoExe install intellijidea-community -y
                 Setup-Tomcat-Connector
                 Set-EnvVars
                 Install-Extensions
