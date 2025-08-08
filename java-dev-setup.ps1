@@ -191,7 +191,6 @@ function Set-EnvVariables {
     Write-Host "✅ PATH updated with Java and Maven binaries"
 }
 
-# Remove the Community Server Connector from the Install-VSCodeExtensions function
 function Install-VSCodeExtensions {
     Write-Host "`nInstalling VS Code extensions..."
     
