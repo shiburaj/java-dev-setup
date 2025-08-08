@@ -58,44 +58,35 @@ function Install-VSCode {
     # sleep for 10 secs
     Start-Sleep -Seconds 10
 
-    # Check if 'code' command is available
-    if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
-        Write-Host "⚠ 'code' command not found. Restarting PowerShell to refresh PATH..."
-        
-        # Self-restart the script with admin rights
-        $scriptPath = $MyInvocation.MyCommand.Path
-        Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -Restarted" -Verb RunAs
-        exit
-    }
-    Write-Host "✅ VS Code is ready to use!" -ForegroundColor Green
-    Write-Host "`n[12/14] Installing VS Code extensions..."
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + 
+                [System.Environment]::GetEnvironmentVariable("Path", "User")
     
-    # Check if 'code' command is available
-    if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
-        Write-Host "⚠ 'code' command not found. Restarting PowerShell to refresh PATH..."
-        
-        # Self-restart the script with admin rights
-        $scriptPath = $MyInvocation.MyCommand.Path
-        Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -Restarted" -Verb RunAs
-        exit
+    # Install extensions
+    $vscodePath = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin"
+    if (-not ($env:Path -like "*$vscodePath*")) {
+        $env:Path += ";$vscodePath"
     }
     
-    # Proceed with extension installation if 'code' is available
-    $extensions = @(
-        "vscjava.vscode-java-pack",
-        "redhat.vscode-community-server-connector",
-        "pivotal.vscode-spring-boot",
-        "vmware.vscode-spring-boot-dashboard",
-        "vscjava.vscode-spring-initializr",
-        "vscjava.vscode-spring-boot-tools",
-        "mtxr.sqltools",
-        "mtxr.sqltools-driver-mysql"
-    )
+    if (Get-Command code -ErrorAction SilentlyContinue) {
+        # Proceed with extension installation if 'code' is available
+        $extensions = @(
+            "vscjava.vscode-java-pack",
+            "redhat.vscode-community-server-connector",
+            "pivotal.vscode-spring-boot",
+            "vmware.vscode-spring-boot-dashboard",
+            "vscjava.vscode-spring-initializr",
+            "vscjava.vscode-spring-boot-tools",
+            "mtxr.sqltools",
+            "mtxr.sqltools-driver-mysql"
+        )
 
-    foreach ($extension in $extensions) {
-        code --install-extension $extension
-        Start-Sleep -Seconds 2
-    }
+        foreach ($extension in $extensions) {
+            code --install-extension $extension
+            Start-Sleep -Seconds 2
+        }
+    } else {
+        Write-Host "⚠️ Could not find 'code' command. Please restart and try again." -ForegroundColor Yellow
+    } 
     
     Write-Host "✅ VS Code extensions installed!" -ForegroundColor Green
 }
