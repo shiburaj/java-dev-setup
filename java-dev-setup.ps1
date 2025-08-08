@@ -123,7 +123,7 @@ function Install-IntelliJ {
 
 function Install-Tomcat {
     Write-Host "`n[10/14] Installing Apache Tomcat v10..."
-    choco install tomcat -version 10.0.27 -y
+    choco install tomcat -y
     
     $tomcatPath = (Get-ChildItem "C:\Program Files\Apache Software Foundation\tomcat-*" | 
                   Sort-Object LastWriteTime -Descending | 
