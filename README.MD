@@ -60,5 +60,5 @@ This script does the following:
 3. Go to the directory where you have downloaded the file from the Powershell.
 4. Run following command to run the script
 ```
-powershell -ExecutionPolicy Bypass -File java-dev-steup.ps1
+powershell -ExecutionPolicy Bypass -File java-dev-setup.ps1
 ```
