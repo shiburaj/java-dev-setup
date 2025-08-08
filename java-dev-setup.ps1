@@ -24,6 +24,7 @@ function Show-Menu {
     Write-Host "12. Install VS Code Extensions"
     Write-Host "13. Install Recommended Tools (1-6,10-12)"
     Write-Host "14. Install ALL Components"
+    Write-Host "15. Install VS Code with Extensions"
     Write-Host "Q. Quit"
     Write-Host "========================================"
 }
@@ -166,24 +167,34 @@ function Set-EnvVariables {
 
 function Install-VSCodeExtensions {
     Write-Host "`n[12/14] Installing VS Code extensions..."
-    Write-Host "`nWaiting 15secs before starting the installation so that Vscode is added to the path..."
     
-    Start-Sleep -Seconds 15
+    # Check if 'code' command is available
+    if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
+        Write-Host "⚠ 'code' command not found. Restarting PowerShell to refresh PATH..."
+        
+        # Self-restart the script with admin rights
+        $scriptPath = $MyInvocation.MyCommand.Path
+        Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -Restarted" -Verb RunAs
+        exit
+    }
     
-    # Java extensions
-    code --install-extension vscjava.vscode-java-pack
+    # Proceed with extension installation if 'code' is available
+    $extensions = @(
+        "vscjava.vscode-java-pack",
+        "pivotal.vscode-spring-boot",
+        "vmware.vscode-spring-boot-dashboard",
+        "vscjava.vscode-spring-initializr",
+        "vscjava.vscode-spring-boot-tools",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-mysql"
+    )
+
+    foreach ($extension in $extensions) {
+        code --install-extension $extension
+        Start-Sleep -Seconds 2
+    }
     
-    # Spring extensions
-    code --install-extension pivotal.vscode-spring-boot
-    code --install-extension vmware.vscode-spring-boot-dashboard
-    code --install-extension vscjava.vscode-spring-initializr
-    code --install-extension vscjava.vscode-spring-boot-tools
-    
-    # SQL Tools
-    code --install-extension mtxr.sqltools
-    code --install-extension mtxr.sqltools-driver-mysql
-    
-    Write-Host "✅ VS Code extensions installed successfully!" -ForegroundColor Green
+    Write-Host "✅ VS Code extensions installed!" -ForegroundColor Green
 }
 
 function Install-Recommended {
@@ -217,6 +228,13 @@ function Install-All {
     Write-Host "✅ ALL components installed successfully!" -ForegroundColor Green
 }
 
+function Install-VSCodeWithExtensions {
+    Write-Host "`n[15/14] Installing VS Code with recommended extensions..."
+    Install-VSCode
+    Install-VSCodeExtensions
+    Write-Host "✅ VS Code with extensions installed successfully!" -ForegroundColor Green
+}
+
 # Main program
 do {
     Show-Menu
@@ -237,6 +255,7 @@ do {
         '12' { Install-VSCodeExtensions }
         '13' { Install-Recommended }
         '14' { Install-All }
+        '15' { Install-VSCodeWithExtensions }
         'Q' { 
             Write-Host "`n✅ Setup completed! Please restart your system." -ForegroundColor Green
             exit 
