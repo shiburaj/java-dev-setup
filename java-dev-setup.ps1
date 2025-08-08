@@ -269,7 +269,9 @@ do {
             Write-Host "👉 Please restart your terminal or system to apply environment variables."
             exit 
         }
-        default { Write-Host "Invalid selection. Please try again." }
+        default { 
+            Write-Host "Invalid selection. Please try again." 
+        }
     }
     pause
 }
