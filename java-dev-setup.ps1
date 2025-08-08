@@ -21,10 +21,8 @@ function Show-Menu {
     Write-Host "9. Install IntelliJ IDEA Community Edition"
     Write-Host "10. Install Apache Tomcat v10 + Configure"
     Write-Host "11. Set Environment Variables"
-    Write-Host "12. Install VS Code Extensions"
-    Write-Host "13. Install Recommended Tools (1-6,10-12)"
+    Write-Host "13. Install Shiburaj's Recommended Tools"
     Write-Host "14. Install ALL Components"
-    Write-Host "15. Install VS Code with Extensions"
     Write-Host "Q. Quit"
     Write-Host "========================================"
 }
@@ -56,6 +54,50 @@ function Install-VSCode {
     Write-Host "`n[4/14] Installing VS Code..."
     choco install vscode -y
     Write-Host "✅ VS Code installed successfully!" -ForegroundColor Green
+
+    # sleep for 10 secs
+    Start-Sleep -Seconds 10
+
+    # Check if 'code' command is available
+    if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
+        Write-Host "⚠ 'code' command not found. Restarting PowerShell to refresh PATH..."
+        
+        # Self-restart the script with admin rights
+        $scriptPath = $MyInvocation.MyCommand.Path
+        Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -Restarted" -Verb RunAs
+        exit
+    }
+    Write-Host "✅ VS Code is ready to use!" -ForegroundColor Green
+    Write-Host "`n[12/14] Installing VS Code extensions..."
+    
+    # Check if 'code' command is available
+    if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
+        Write-Host "⚠ 'code' command not found. Restarting PowerShell to refresh PATH..."
+        
+        # Self-restart the script with admin rights
+        $scriptPath = $MyInvocation.MyCommand.Path
+        Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -Restarted" -Verb RunAs
+        exit
+    }
+    
+    # Proceed with extension installation if 'code' is available
+    $extensions = @(
+        "vscjava.vscode-java-pack",
+        "redhat.vscode-community-server-connector",
+        "pivotal.vscode-spring-boot",
+        "vmware.vscode-spring-boot-dashboard",
+        "vscjava.vscode-spring-initializr",
+        "vscjava.vscode-spring-boot-tools",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-mysql"
+    )
+
+    foreach ($extension in $extensions) {
+        code --install-extension $extension
+        Start-Sleep -Seconds 2
+    }
+    
+    Write-Host "✅ VS Code extensions installed!" -ForegroundColor Green
 }
 
 function Install-MySQL {
@@ -101,8 +143,7 @@ function Install-Tomcat {
         return
     }
     
-    # Install VS Code extension
-    code --install-extension redhat.vscode-community-server-connector
+    
     
     # Configure server connector
     $serverConfig = @{
@@ -165,38 +206,6 @@ function Set-EnvVariables {
     Write-Host "✅ Environment variables configured" -ForegroundColor Green
 }
 
-function Install-VSCodeExtensions {
-    Write-Host "`n[12/14] Installing VS Code extensions..."
-    
-    # Check if 'code' command is available
-    if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
-        Write-Host "⚠ 'code' command not found. Restarting PowerShell to refresh PATH..."
-        
-        # Self-restart the script with admin rights
-        $scriptPath = $MyInvocation.MyCommand.Path
-        Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -Restarted" -Verb RunAs
-        exit
-    }
-    
-    # Proceed with extension installation if 'code' is available
-    $extensions = @(
-        "vscjava.vscode-java-pack",
-        "pivotal.vscode-spring-boot",
-        "vmware.vscode-spring-boot-dashboard",
-        "vscjava.vscode-spring-initializr",
-        "vscjava.vscode-spring-boot-tools",
-        "mtxr.sqltools",
-        "mtxr.sqltools-driver-mysql"
-    )
-
-    foreach ($extension in $extensions) {
-        code --install-extension $extension
-        Start-Sleep -Seconds 2
-    }
-    
-    Write-Host "✅ VS Code extensions installed!" -ForegroundColor Green
-}
-
 function Install-Recommended {
     Write-Host "`n[13/14] Installing recommended tools..."
     Install-Chocolatey
@@ -207,7 +216,6 @@ function Install-Recommended {
     Install-HeidiSQL
     Install-Tomcat
     Set-EnvVariables
-    Install-VSCodeExtensions
     Write-Host "✅ Recommended tools installed successfully!" -ForegroundColor Green
 }
 
@@ -224,15 +232,7 @@ function Install-All {
     Install-IntelliJ
     Install-Tomcat
     Set-EnvVariables
-    Install-VSCodeExtensions
     Write-Host "✅ ALL components installed successfully!" -ForegroundColor Green
-}
-
-function Install-VSCodeWithExtensions {
-    Write-Host "`n[15/14] Installing VS Code with recommended extensions..."
-    Install-VSCode
-    Install-VSCodeExtensions
-    Write-Host "✅ VS Code with extensions installed successfully!" -ForegroundColor Green
 }
 
 # Main program
@@ -252,10 +252,8 @@ do {
         '9' { Install-IntelliJ }
         '10' { Install-Tomcat }
         '11' { Set-EnvVariables }
-        '12' { Install-VSCodeExtensions }
         '13' { Install-Recommended }
         '14' { Install-All }
-        '15' { Install-VSCodeWithExtensions }
         'Q' { 
             Write-Host "`n✅ Setup completed! Please restart your system." -ForegroundColor Green
             exit 
