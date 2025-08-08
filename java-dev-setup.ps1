@@ -166,8 +166,9 @@ function Set-EnvVariables {
 
 function Install-VSCodeExtensions {
     Write-Host "`n[12/14] Installing VS Code extensions..."
+    Write-Host "`nWaiting 15secs before starting the installation so that Vscode is added to the path..."
     
-    Start-Sleep -Seconds 5
+    Start-Sleep -Seconds 15
     
     # Java extensions
     code --install-extension vscjava.vscode-java-pack
