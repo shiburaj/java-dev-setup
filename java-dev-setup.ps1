@@ -1,6 +1,8 @@
-#----------------------------
-# Menu-Driven Development Environment Setup
-#----------------------------
+<#
+Java Development Environment Setup Script
+Version: 2.0
+Author: Shiburaj
+#>
 
 function Show-Menu {
     param (
@@ -19,167 +21,137 @@ function Show-Menu {
     Write-Host "9. Install IntelliJ IDEA Community Edition"
     Write-Host "10. Install Apache Tomcat v10 + Configure"
     Write-Host "11. Set Environment Variables"
-    Write-Host "12. Install VS Code Extensions (Java, Spring, SQLTools)"
-    Write-Host "13. Install Shiburaj Sir's Suggested Tools (1,2,3,4,5,6,10,11,12)"
-    Write-Host "14. Install ALL"
+    Write-Host "12. Install VS Code Extensions"
+    Write-Host "13. Install Recommended Tools (1-6,10-12)"
+    Write-Host "14. Install ALL Components"
     Write-Host "Q. Quit"
+    Write-Host "========================================"
 }
 
 function Install-Chocolatey {
-    Write-Host "`nInstalling Chocolatey..."
-    if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
+    Write-Host "`n[1/14] Installing Chocolatey package manager..."
+    if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
         Set-ExecutionPolicy Bypass -Scope Process -Force
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
     }
-    
-    # Update Chocolatey
     choco upgrade chocolatey -y
-    Write-Host "✅ Chocolatey installed and updated successfully!"
+    Write-Host "✅ Chocolatey installed and updated successfully!" -ForegroundColor Green
 }
 
 function Install-Java {
-    Write-Host "`nInstalling Microsoft OpenJDK 21..."
+    Write-Host "`n[2/14] Installing Microsoft OpenJDK 21..."
     choco install microsoft-openjdk-21 -y
-    Write-Host "✅ Java installed successfully!"
+    Write-Host "✅ Java installed successfully!" -ForegroundColor Green
 }
 
 function Install-Maven {
-    Write-Host "`nInstalling Maven..."
+    Write-Host "`n[3/14] Installing Maven..."
     choco install maven -y
-    Write-Host "✅ Maven installed successfully!"
+    Write-Host "✅ Maven installed successfully!" -ForegroundColor Green
 }
 
 function Install-VSCode {
-    Write-Host "`nInstalling VS Code..."
+    Write-Host "`n[4/14] Installing VS Code..."
     choco install vscode -y
-    Write-Host "✅ VS Code installed successfully!"
+    Write-Host "✅ VS Code installed successfully!" -ForegroundColor Green
 }
 
 function Install-MySQL {
-    Write-Host "`nInstalling MySQL Server..."
+    Write-Host "`n[5/14] Installing MySQL Server..."
     choco install mysql -y
-    Write-Host "✅ MySQL Server installed successfully!"
+    Write-Host "✅ MySQL Server installed successfully!" -ForegroundColor Green
 }
 
 function Install-HeidiSQL {
-    Write-Host "`nInstalling HeidiSQL..."
+    Write-Host "`n[6/14] Installing HeidiSQL..."
     choco install heidisql -y
-    Write-Host "✅ HeidiSQL installed successfully!"
+    Write-Host "✅ HeidiSQL installed successfully!" -ForegroundColor Green
 }
 
 function Install-DBeaver {
-    Write-Host "`nInstalling DBeaver Community..."
+    Write-Host "`n[7/14] Installing DBeaver Community..."
     choco install dbeaver-community -y
-    Write-Host "✅ DBeaver Community installed successfully!"
+    Write-Host "✅ DBeaver Community installed successfully!" -ForegroundColor Green
 }
 
 function Install-Eclipse {
-    Write-Host "`nInstalling Eclipse IDE for Enterprise Java..."
+    Write-Host "`n[8/14] Installing Eclipse IDE for Enterprise Java..."
     choco install eclipse-jee -y
-    Write-Host "✅ Eclipse IDE installed successfully!"
+    Write-Host "✅ Eclipse IDE installed successfully!" -ForegroundColor Green
 }
 
 function Install-IntelliJ {
-    Write-Host "`nInstalling IntelliJ IDEA Community Edition..."
+    Write-Host "`n[9/14] Installing IntelliJ IDEA Community Edition..."
     choco install intellijidea-community -y
-    Write-Host "✅ IntelliJ IDEA installed successfully!"
+    Write-Host "✅ IntelliJ IDEA installed successfully!" -ForegroundColor Green
 }
 
 function Install-Tomcat {
-    Write-Host "`nInstalling Apache Tomcat v10 and Configuring VS Code Connector..."
-    
-    # 1. Install Tomcat
+    Write-Host "`n[10/14] Installing Apache Tomcat v10..."
     choco install tomcat -version 10.0.27 -y
     
-    # Find Tomcat installation path
-    $tomcatPath = (Get-ChildItem "C:\Program Files\Apache Software Foundation\tomcat-*" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+    $tomcatPath = (Get-ChildItem "C:\Program Files\Apache Software Foundation\tomcat-*" | 
+                  Sort-Object LastWriteTime -Descending | 
+                  Select-Object -First 1).FullName
     
     if (-not $tomcatPath) {
-        Write-Host "⚠️ Tomcat installation path not found"
+        Write-Host "⚠️ Tomcat installation path not found" -ForegroundColor Yellow
         return
     }
     
-    Write-Host "✅ Tomcat installed at $tomcatPath"
-    
-    # 2. Install Community Server Connector extension
-    Write-Host "Installing VS Code Community Server Connector extension..."
+    # Install VS Code extension
     code --install-extension redhat.vscode-community-server-connector
-    Start-Sleep -Seconds 5  # Wait for extension to install
     
-    # 3. Set Environment Variables
-    [Environment]::SetEnvironmentVariable("CATALINA_HOME", $tomcatPath, "Machine")
-    $envPath = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
-    if ($envPath -notlike "*$tomcatPath\bin*") {
-        $envPath += ";$tomcatPath\bin"
-        [Environment]::SetEnvironmentVariable("Path", $envPath, "Machine")
+    # Configure server connector
+    $serverConfig = @{
+        name       = "Tomcat 10"
+        host       = "localhost"
+        port       = 8080
+        serverType = "tomcat"
+        path       = $tomcatPath
+        deployPath = "$tomcatPath\webapps"
+        user       = "admin"
+        password   = "admin"
     }
     
-    # 4. Configure VS Code Community Server Connector
-    $vscodeSettingsPath = "$env:APPDATA\Code\User\settings.json"
-    $tomcatServerConfig = @{
-        "name" = "Tomcat 10"
-        "host" = "localhost"
-        "port" = 8080
-        "serverType" = "tomcat"
-        "path" = $tomcatPath
-        "deployPath" = "$tomcatPath\webapps"
-        "user" = "admin"
-        "password" = "admin"
-    }
-    
-    # Create or update VS Code settings
-    if (Test-Path $vscodeSettingsPath) {
-        $settings = Get-Content $vscodeSettingsPath | ConvertFrom-Json -AsHashtable
+    $settingsPath = "$env:APPDATA\Code\User\settings.json"
+    $settings = if (Test-Path $settingsPath) {
+        Get-Content $settingsPath | ConvertFrom-Json -AsHashtable
     } else {
-        $settings = @{}
+        @{}
     }
     
     if (-not $settings.ContainsKey('communityServerConnector.servers')) {
         $settings['communityServerConnector.servers'] = @()
     }
     
-    $settings['communityServerConnector.servers'] += $tomcatServerConfig
-    $settings | ConvertTo-Json -Depth 10 | Out-File $vscodeSettingsPath -Force
+    $settings['communityServerConnector.servers'] += $serverConfig
+    $settings | ConvertTo-Json -Depth 10 | Out-File $settingsPath -Force
     
-    # 5. Create default admin user if not exists
-    $tomcatUsersPath = "$tomcatPath\conf\tomcat-users.xml"
-    if (Test-Path $tomcatUsersPath) {
-        $tomcatUsers = Get-Content $tomcatUsersPath
-        if ($tomcatUsers -notmatch '<user username="admin" password="admin" roles="manager-gui,admin-gui"/>') {
-            $tomcatUsers = $tomcatUsers -replace '</tomcat-users>', '  <user username="admin" password="admin" roles="manager-gui,admin-gui"/></tomcat-users>'
-            $tomcatUsers | Out-File $tomcatUsersPath -Force
-            Write-Host "✅ Created default admin user (admin/admin)"
-        }
-    }
-    
-    Write-Host "✅ Tomcat installation and VS Code configuration complete"
-    Write-Host "ℹ️ You can now manage Tomcat from VS Code's Servers view (Ctrl+Shift+P > 'Show Servers')"
+    Write-Host "✅ Tomcat installed and configured successfully!" -ForegroundColor Green
 }
 
 function Set-EnvVariables {
-    Write-Host "`nSetting environment variables..."
+    Write-Host "`n[11/14] Setting environment variables..."
     
     # Set JAVA_HOME
     $jdkPath = (Get-ChildItem "C:\Program Files\Microsoft\jdk-21*" | Select-Object -First 1).FullName
     if ($jdkPath) {
         [Environment]::SetEnvironmentVariable("JAVA_HOME", $jdkPath, "Machine")
-        Write-Host "✅ JAVA_HOME set to $jdkPath"
-    } else {
-        Write-Host "⚠️ Java not found. Please install Java first."
+        Write-Host "✅ JAVA_HOME set to: $jdkPath" -ForegroundColor Green
     }
     
     # Set MAVEN_HOME
-    $mavenPath = (Get-ChildItem "C:\ProgramData\chocolatey\lib\maven" | Select-Object -First 1).FullName + "\apache-maven-*"
+    $mavenPath = (Get-ChildItem "C:\ProgramData\chocolatey\lib\maven" | 
+                 Select-Object -First 1).FullName + "\apache-maven-*"
     if ($mavenPath) {
         $mavenResolvedPath = (Resolve-Path $mavenPath).Path
         [Environment]::SetEnvironmentVariable("MAVEN_HOME", $mavenResolvedPath, "Machine")
-        Write-Host "✅ MAVEN_HOME set to $mavenResolvedPath"
-    } else {
-        Write-Host "⚠️ Maven not found. Please install Maven first."
+        Write-Host "✅ MAVEN_HOME set to: $mavenResolvedPath" -ForegroundColor Green
     }
     
-    # Update PATH with Java and Maven
+    # Update PATH
     $envPath = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
     if ($jdkPath -and $envPath -notlike "*$jdkPath\bin*") {
         $envPath += ";$jdkPath\bin"
@@ -188,14 +160,14 @@ function Set-EnvVariables {
         $envPath += ";$mavenResolvedPath\bin"
     }
     [Environment]::SetEnvironmentVariable("Path", $envPath, "Machine")
-    Write-Host "✅ PATH updated with Java and Maven binaries"
+    
+    Write-Host "✅ Environment variables configured" -ForegroundColor Green
 }
 
 function Install-VSCodeExtensions {
-    Write-Host "`nInstalling VS Code extensions..."
+    Write-Host "`n[12/14] Installing VS Code extensions..."
     
-    # Wait a bit to ensure VS Code is fully installed
-    Start-Sleep -Seconds 10
+    Start-Sleep -Seconds 5
     
     # Java extensions
     code --install-extension vscjava.vscode-java-pack
@@ -210,11 +182,11 @@ function Install-VSCodeExtensions {
     code --install-extension mtxr.sqltools
     code --install-extension mtxr.sqltools-driver-mysql
     
-    Write-Host "✅ VS Code extensions installed successfully!"
+    Write-Host "✅ VS Code extensions installed successfully!" -ForegroundColor Green
 }
 
-function Install-ShiburajTools {
-    Write-Host "`nInstalling Shiburaj Sir's Suggested Tools..."
+function Install-Recommended {
+    Write-Host "`n[13/14] Installing recommended tools..."
     Install-Chocolatey
     Install-Java
     Install-Maven
@@ -224,11 +196,11 @@ function Install-ShiburajTools {
     Install-Tomcat
     Set-EnvVariables
     Install-VSCodeExtensions
-    Write-Host "✅ Shiburaj Sir's Suggested Tools installed successfully!"
+    Write-Host "✅ Recommended tools installed successfully!" -ForegroundColor Green
 }
 
 function Install-All {
-    Write-Host "`nInstalling ALL components..."
+    Write-Host "`n[14/14] Installing ALL components..."
     Install-Chocolatey
     Install-Java
     Install-Maven
@@ -241,13 +213,14 @@ function Install-All {
     Install-Tomcat
     Set-EnvVariables
     Install-VSCodeExtensions
-    Write-Host "✅ ALL components installed successfully!"
+    Write-Host "✅ ALL components installed successfully!" -ForegroundColor Green
 }
 
 # Main program
 do {
     Show-Menu
-    $selection = Read-Host "`nPlease make a selection"
+    $selection = Read-Host "`nPlease make a selection (1-14 or Q to quit)"
+    
     switch ($selection) {
         '1' { Install-Chocolatey }
         '2' { Install-Java }
@@ -261,17 +234,19 @@ do {
         '10' { Install-Tomcat }
         '11' { Set-EnvVariables }
         '12' { Install-VSCodeExtensions }
-        '13' { Install-ShiburajTools }
+        '13' { Install-Recommended }
         '14' { Install-All }
         'Q' { 
-            Write-Host "`n✅ Development environment setup completed!" 
-            Write-Host "👉 Please restart your terminal or system to apply environment variables."
+            Write-Host "`n✅ Setup completed! Please restart your system." -ForegroundColor Green
             exit 
         }
         default { 
-            Write-Host "Invalid selection. Please try again." 
+            Write-Host "Invalid selection. Please try again." -ForegroundColor Red
         }
     }
-    pause
+    
+    if ($selection -ne 'Q') {
+        pause
+    }
 }
 until ($selection -eq 'Q')
