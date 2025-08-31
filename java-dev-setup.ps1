@@ -14,14 +14,14 @@ function Show-Menu {
     Write-Host "2. Install Microsoft OpenJDK 21"
     Write-Host "3. Install Maven"
     Write-Host "4. Install VS Code"
-    Write-Host "5. Install MySQL Server"
+    Write-Host "5. Install MySQL Server & MySQL Workbench"
     Write-Host "6. Install HeidiSQL"
     Write-Host "7. Install DBeaver Community"
     Write-Host "8. Install Eclipse IDE for Enterprise Java"
     Write-Host "9. Install IntelliJ IDEA Community Edition"
     Write-Host "10. Install Apache Tomcat v10 + Configure"
     Write-Host "11. Set Environment Variables"
-    Write-Host "13. Install Shiburaj's Recommended Tools"
+    Write-Host "13. Install Shiburaj's Recommended Tools (Chocolatey, OpenJDK 21, Maven, VS Code, MySQL and MySQL Workbench, Tomcat and Set-EnvVariables)"
     Write-Host "14. Install ALL Components"
     Write-Host "Q. Quit"
     Write-Host "========================================"
@@ -95,6 +95,9 @@ function Install-MySQL {
     Write-Host "`n[5/14] Installing MySQL Server..."
     choco install mysql -y
     Write-Host "✅ MySQL Server installed successfully!" -ForegroundColor Green
+    Write-Host "`n[5/14] Installing MySQL Workbench..."
+    choco install mysql-workbench -y
+    Write-Host "✅ MySQL Workbench installed successfully!" -ForegroundColor Green
 }
 
 function Install-HeidiSQL {
@@ -204,10 +207,9 @@ function Install-Recommended {
     Install-Maven
     Install-VSCode
     Install-MySQL
-    Install-HeidiSQL
     Install-Tomcat
     Set-EnvVariables
-    Write-Host "✅ Recommended tools installed successfully!" -ForegroundColor Green
+    Write-Host "✅ Shiburaj's Recommended tools installed successfully!" -ForegroundColor Green
 }
 
 function Install-All {
